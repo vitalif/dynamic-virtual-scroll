@@ -6,7 +6,6 @@
         <div id="realcontent" style="z-index: 1; width: 100%; position: absolute"></div>
     </div>
 </div>
-<button onclick="scrolltoend()">end</button>
 <style>
 .item { border: 1px solid gray; box-sizing: border-box; text-align: center; }
 </style>
@@ -17,21 +16,31 @@ var s = document.getElementById('scroll');
 var c = document.getElementById('content');
 var rc = document.getElementById('realcontent');
 
-var items = [];
-var maxdiff = 0, minheight = 30;
-for (var i = 0; i < 100; i++)
-    items.push(30+Math.round(Math.random()*120));
-items = [31,109,107,97,140,133,49,69,123,43,137,128,31,101,120,148,119,30,31,37,43,119,105,106,91,148,36,85,76,97,148,31,53,126,138,51,85,65,53,78,39,49,133,49,103,146,143,148,115,49,55,98,44,84,57,127,98,98,104,116,150,82,123,62,134,109,89,71,36,50,146,146,53,35,86,143,86,138,39,81,72,106,88,117,127,97,127,147,102,42,124,99,32,51,84,45,106,139,140,69];
+var minheight = 30;
 
-var totalItems = items.length;
+var api = (function() {
+    var items = [];
+    for (var i = 0; i < 100; i++)
+        items.push(30+Math.round(Math.random()*120));
+    items = [31,109,107,97,140,133,49,69,123,43,137,128,31,101,120,148,119,30,31,37,43,119,105,106,91,148,36,85,76,97,148,31,53,126,138,51,85,65,53,78,39,49,133,49,103,146,143,148,115,49,55,98,44,84,57,127,98,98,104,116,150,82,123,62,134,109,89,71,36,50,146,146,53,35,86,143,86,138,39,81,72,106,88,117,127,97,127,147,102,42,124,99,32,51,84,45,106,139,140,69];
+    // Аналог API получения элементов
+    return [ items.length, function(start, count, callback)
+    {
+        callback(items.slice(start, start+count));
+    } ]
+})();
+var totalItems = api[0];
+var getItems = api[1];
 
-c.style.height = (items.length*minheight)+'px';
+c.style.height = (totalItems*minheight)+'px';
 rc.parentNode.style.width = c.offsetWidth+'px';
 window.addEventListener('resize', function() {
     rc.parentNode.style.width = c.offsetWidth+'px';
 });
 
-var curFirst = 0, curCount = 0, curPos = 0, curVisibleHeight = 0, initLast = 0;
+var lastFirst = 0;
+var curFirst = 0, curOffset = 0, curCount = 0, curPos = null;
+var pagesize = Math.floor(s.offsetHeight/minheight);
 
 rc.parentNode.addEventListener('keydown', handlekey);
 rc.parentNode.addEventListener('DOMMouseScroll', mouse_wheel);
@@ -68,66 +77,77 @@ function handlekey(ev)
         s.scrollTop = s.scrollHeight-s.offsetHeight+1;
 }
 
-function scrolltoend()
+var rq = [];
+var loadedItems = [];
+
+function loadfrom(start, count)
 {
-    s.scrollTop += 1000;
+    console.log('load from '+start+': '+count+' items');
+    getItems(start, count, function(partItems)
+    {
+        var h, i;
+        for (i = 0; i < partItems.length; i++)
+            loadedItems[start+i] = partItems[i];
+        rq.length && (rq.shift())();
+    });
 }
 
-var tm;
-function scrollasync()
-{
-    if (!tm)
-        tm = setTimeout(scrollother, 200);
-}
-
-var skip = 0;
 // скроллинг в пикселях (в пределах видимости - можно использовать для up/down, pgup/pgdown, колеса мыши)
 function scrollbypx(px)
 {
-    var newLast = initLast + s.scrollTop / (s.scrollHeight-s.offsetHeight+1) * (totalItems-initLast);
-    if (newLast > totalItems)
-        newLast = totalItems;
-    var nl = Math.ceil(newLast)-1;
-    var no = newLast-nl;
+    if (rq.length)
+    {
+        rq.push(function() { scrollbypx(px) });
+        return;
+    }
     if (px < 0)
     {
-        // считаем от последнего
-        px += no*items[nl];
-        while (nl > curFirst && px < 0)
+        var cpx = px;
+        cpx += curOffset*loadedItems[curFirst];
+        var nf = curFirst;
+        while (nf > 0 && cpx < 0)
         {
-            nl--;
-            px += items[nl];
+            nf--;
+            if (!loadedItems[nf])
+            {
+                rq.unshift(function() { scrollbypx(px) });
+                loadfrom(nf+1 > pagesize ? nf+1-pagesize : 0, pagesize);
+                return;
+            }
+            cpx += loadedItems[nf];
         }
-        no = (px < 0 ? 0 : px)/items[nl];
-        newLast = nl+no;
-        if (newLast < initLast)
-        {
-            newLast = initLast;
-            nl = Math.ceil(newLast)-1;
-            no = newLast-nl;
-        }
+        newFirst = nf+(cpx/loadedItems[nf]);
     }
     else
     {
-        // считаем от первого
-        px -= (items[curFirst]-curOffset);
+        px -= loadedItems[curFirst]*(1-curOffset);
         var nf = curFirst;
         while (nf < totalItems-1 && px > 0)
         {
             nf++;
-            px -= items[nf];
+            px -= loadedItems[nf];
         }
-        nfo = (px > 0 ? items[nf] : px+items[nf]);
-        for (var h = -nfo, i = nf; i < totalItems && h <= s.offsetHeight; i++)
-            h += items[i];
-        if (h <= s.offsetHeight)
-            newLast = totalItems;
-        else
-            newLast = i-(h-s.offsetHeight)/items[i-1];
+        nfo = (px >= 0 ? loadedItems[nf] : px+loadedItems[nf]);
+        newFirst = nf+(nfo/loadedItems[nf]);
     }
-    //skip++;
-    s.scrollTop = (newLast-initLast)/(totalItems-initLast)*(s.scrollHeight-s.offsetHeight+1);
-    renderitems();
+    s.scrollTop = newFirst/lastFirst*(s.scrollHeight-s.offsetHeight+1);
+}
+
+function loadnext()
+{
+    var h, i;
+    for (h = 0, i = curFirst; i < totalItems && h < s.offsetHeight; i++)
+    {
+        if (!loadedItems[i])
+        {
+            rq.unshift(loadnext);
+            loadfrom(i, pagesize);
+            return;
+        }
+        h += (i == curFirst ? loadedItems[i]*(1-curOffset) : loadedItems[i]);
+    }
+    curCount = i-curFirst+1;
+    rq.length && (rq.shift())();
 }
 
 function renderitems()
@@ -135,48 +155,70 @@ function renderitems()
     var ih = '', h = 0;
     for (var i = 0; i < curCount; i++)
     {
-        ih += '<div class="item" style="height: '+items[curFirst+i]+'px">'+(curFirst+i)+'</div>';
-        h += items[curFirst+i];
+        ih += '<div class="item" style="height: '+loadedItems[curFirst+i]+'px">'+(curFirst+i)+'</div>';
+        h += loadedItems[curFirst+i];
     }
     rc.innerHTML = ih;
-    rc.style.top = (-curOffset)+'px';
+    rc.style.top = Math.round(-loadedItems[curFirst]*curOffset)+'px';
     rc.style.height = h+'px';
-}
-
-function calcBack(nl, no)
-{
-    var i, h = no*items[nl];
-    for (i = nl-1; i >= 0 && h < s.offsetHeight; i--)
-        h += items[i];
-    curFirst = i+1;
-    curOffset = h-s.offsetHeight;
-    curCount = nl-i;
+    // Тут можно убить лишние элементы
+    var q0 = curFirst-pagesize;
+    q0 = q0 - q0%pagesize;
+    var q1 = curFirst+curCount+pagesize;
+    q1 = q1 + (pagesize-q1%pagesize);
+    var destroyed = 0;
+    for (var i in loadedItems)
+    {
+        if (i < q0 || i >= q1)
+        {
+            destroyed++;
+            delete loadedItems[i];
+        }
+    }
+    if (destroyed > 0)
+        console.log('destroy '+destroyed+' items');
 }
 
 // нелинейный скроллинг (в % от элементов)
 function scrollother()
 {
-    if (skip)
-        return skip--;
-    tm = null;
-    var i, h;
-    if (!curCount)
+    var pos = s.scrollTop;
+    if (rq.length)
+        rq.push(scrollother);
+    else
     {
-        h = 0;
-        for (i = 0; i < totalItems && h < s.offsetHeight; i++)
-            h += items[i];
-        initLast = i-(h-s.offsetHeight)/items[i-1];
+        var i, h;
+        if (s.scrollTop == curPos)
+            return;
+        var newFirst = s.scrollTop / (s.scrollHeight-s.offsetHeight+1) * lastFirst;
+        if (newFirst > lastFirst)
+            newFirst = lastFirst;
+        curFirst = Math.floor(newFirst);
+        curOffset = newFirst-curFirst;
+        curPos = s.scrollTop;
+        rq.unshift(renderitems);
+        loadnext();
     }
-    var newLast = initLast + s.scrollTop / (s.scrollHeight-s.offsetHeight+1) * (totalItems-initLast);
-    if (newLast > totalItems)
-        newLast = totalItems;
-    var nl = Math.ceil(newLast)-1;
-    var no = newLast-nl;
-    calcBack(nl, no);
-
-    renderitems();
 }
 
-scrollother();
+function initscroll()
+{
+    var h = 0, i;
+    for (i = totalItems-1; i >= 0 && h < s.offsetHeight; i--)
+    {
+        if (!loadedItems[i])
+        {
+            rq.unshift(initscroll);
+            loadfrom(i+1-pagesize, pagesize);
+            return;
+        }
+        h += loadedItems[i];
+    }
+    lastFirst = i+1+(h-s.offsetHeight)/loadedItems[i+1];
+    rq.length && (rq.shift())();
+}
+
+rq.push(scrollother);
+initscroll();
 //-->
 </script>
