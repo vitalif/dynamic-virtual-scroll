@@ -146,7 +146,7 @@ function loadnext()
         }
         h += (i == curFirst ? loadedItems[i]*(1-curOffset) : loadedItems[i]);
     }
-    curCount = i-curFirst+1;
+    curCount = i-curFirst;
     rq.length && (rq.shift())();
 }
 
