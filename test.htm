@@ -1,10 +1,6 @@
-<div style="position: relative">
-    <div id="scroll" style="position: relative; overflow-y: scroll; width: 300px; height: 300px; border: 1px solid gray;" onscroll="scrollother()">
-        <div style="height: 1500px" id="content"></div>
-    </div>
-    <div tabindex="1" style="z-index: 1; position: absolute; top: 0; width: 283px; height: 300px; overflow: hidden;">
-        <div id="realcontent" style="z-index: 1; width: 100%; position: absolute"></div>
-    </div>
+<div tabindex="1" id="scroll" style="overflow-y: scroll; width: 300px; position: relative; height: 300px; border: 1px solid gray;" onscroll="scrollother()">
+    <div style="height: 1500px" id="content"></div>
+    <div id="realcontent" style="z-index: 1; width: 100%; position: absolute; overflow: hidden"></div>
 </div>
 <style>
 .item { border: 1px solid gray; box-sizing: border-box; text-align: center; }
@@ -16,7 +12,7 @@ var s = document.getElementById('scroll');
 var c = document.getElementById('content');
 var rc = document.getElementById('realcontent');
 
-var minheight = 30;
+var minheight = 100;
 
 var api = (function() {
     var items = [];
@@ -33,18 +29,16 @@ var totalItems = api[0];
 var getItems = api[1];
 
 c.style.height = (totalItems*minheight)+'px';
-rc.parentNode.style.width = c.offsetWidth+'px';
-window.addEventListener('resize', function() {
-    rc.parentNode.style.width = c.offsetWidth+'px';
-});
 
 var lastFirst = 0;
 var curFirst = 0, curOffset = 0, curCount = 0, curPos = null;
-var pagesize = Math.floor(s.offsetHeight/minheight);
+var pagesize = Math.floor(s.offsetHeight/30);
 
 rc.parentNode.addEventListener('keydown', handlekey);
-rc.parentNode.addEventListener('DOMMouseScroll', mouse_wheel);
-rc.parentNode.onmousewheel = mouse_wheel;
+c.addEventListener('keydown', handlekey, true);
+rc.addEventListener('keydown', handlekey, true);
+//rc.parentNode.addEventListener('DOMMouseScroll', mouse_wheel);
+//rc.parentNode.onmousewheel = mouse_wheel;
 rc.parentNode.focus();
 
 function mouse_wheel(event)
@@ -75,6 +69,9 @@ function handlekey(ev)
         s.scrollTop = 0;
     else if (ev.keyCode == 35)
         s.scrollTop = s.scrollHeight-s.offsetHeight+1;
+    else
+        return;
+    ev.preventDefault();
 }
 
 var rq = [];
@@ -140,8 +137,13 @@ function loadnext()
     {
         if (!loadedItems[i])
         {
+            var start = i;
+            while (start < totalItems && !loadedItems[start] && start < i+pagesize)
+                start++;
+            start = start-pagesize;
+            start = start < 0 ? 0 : start;
             rq.unshift(loadnext);
-            loadfrom(i, pagesize);
+            loadfrom(start, pagesize);
             return;
         }
         h += (i == curFirst ? loadedItems[i]*(1-curOffset) : loadedItems[i]);
@@ -158,9 +160,10 @@ function renderitems()
         ih += '<div class="item" style="height: '+loadedItems[curFirst+i]+'px">'+(curFirst+i)+'</div>';
         h += loadedItems[curFirst+i];
     }
+    var t = Math.round(-loadedItems[curFirst]*curOffset+s.scrollTop);
     rc.innerHTML = ih;
-    rc.style.top = Math.round(-loadedItems[curFirst]*curOffset)+'px';
-    rc.style.height = h+'px';
+    rc.style.top = t+'px';
+    rc.style.height = (t+h < s.scrollHeight-1 ? h : s.scrollHeight-1-t)+'px';
     // Тут можно убить лишние элементы
     var q0 = curFirst-pagesize;
     q0 = q0 - q0%pagesize;
