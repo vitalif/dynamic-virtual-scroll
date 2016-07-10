@@ -1,4 +1,4 @@
-<div tabindex="1" id="scroll" style="overflow-y: scroll; width: 300px; position: relative; height: 300px; border: 1px solid gray;" onscroll="scrollother()">
+<div tabindex="1" id="scroll" style="overflow-y: scroll; width: 300px; position: relative; height: 300px; border: 1px solid gray;" onscroll="enqueue(scrollother)">
     <div style="height: 1500px" id="content"></div>
     <div id="realcontent" style="z-index: 1; width: 100%; position: absolute; overflow: hidden"></div>
 </div>
@@ -22,7 +22,7 @@ var api = (function() {
     // Аналог API получения элементов
     return [ items.length, function(start, count, callback)
     {
-        callback(items.slice(start, start+count));
+        setTimeout(function() { callback(items.slice(start, start+count)); }, 200);
     } ]
 })();
 var totalItems = api[0];
@@ -50,7 +50,7 @@ function mouse_wheel(event)
         if (event.preventDefault)
             event.preventDefault();
         event.returnValue = false;
-        scrollbypx(-direction * 30);
+        enqueue(scrollbypx, -direction * 30);
     }
 }
 
@@ -63,7 +63,7 @@ function handlekey(ev)
         else if (ev.keyCode == 40) px = 30;
         else if (ev.keyCode == 33) px = -270;
         else if (ev.keyCode == 34) px = 270;
-        scrollbypx(px);
+        enqueue(scrollbypx, px);
     }
     else if (ev.keyCode == 36)
         s.scrollTop = 0;
@@ -76,6 +76,16 @@ function handlekey(ev)
 
 var rq = [];
 var loadedItems = [];
+
+function enqueue(fn, arg)
+{
+    if (!rq.length)
+        fn(arg);
+    else if (arg)
+        rq.push(function() { fn(arg) });
+    else if (rq[rq.length-1] != fn)
+        rq.push(fn);
+}
 
 function loadfrom(start, count)
 {
@@ -92,11 +102,6 @@ function loadfrom(start, count)
 // скроллинг в пикселях (в пределах видимости - можно использовать для up/down, pgup/pgdown, колеса мыши)
 function scrollbypx(px)
 {
-    if (rq.length)
-    {
-        rq.push(function() { scrollbypx(px) });
-        return;
-    }
     if (px < 0)
     {
         var cpx = px;
@@ -128,6 +133,7 @@ function scrollbypx(px)
         newFirst = nf+(nfo/loadedItems[nf]);
     }
     s.scrollTop = newFirst/lastFirst*(s.scrollHeight-s.offsetHeight+1);
+    rq.length && (rq.shift())();
 }
 
 function loadnext()
@@ -180,28 +186,23 @@ function renderitems()
     }
     if (destroyed > 0)
         console.log('destroy '+destroyed+' items');
+    rq.length && (rq.shift())();
 }
 
 // нелинейный скроллинг (в % от элементов)
 function scrollother()
 {
-    var pos = s.scrollTop;
-    if (rq.length)
-        rq.push(scrollother);
-    else
-    {
-        var i, h;
-        if (s.scrollTop == curPos)
-            return;
-        var newFirst = s.scrollTop / (s.scrollHeight-s.offsetHeight+1) * lastFirst;
-        if (newFirst > lastFirst)
-            newFirst = lastFirst;
-        curFirst = Math.floor(newFirst);
-        curOffset = newFirst-curFirst;
-        curPos = s.scrollTop;
-        rq.unshift(renderitems);
-        loadnext();
-    }
+    var i, h;
+    if (s.scrollTop == curPos)
+        return;
+    var newFirst = s.scrollTop / (s.scrollHeight-s.offsetHeight+1) * lastFirst;
+    if (newFirst > lastFirst)
+        newFirst = lastFirst;
+    curFirst = Math.floor(newFirst);
+    curOffset = newFirst-curFirst;
+    curPos = s.scrollTop;
+    rq.unshift(renderitems);
+    loadnext();
 }
 
 function initscroll()
