@@ -167,9 +167,10 @@ function renderitems()
         h += loadedItems[curFirst+i];
     }
     var t = Math.round(-loadedItems[curFirst]*curOffset+s.scrollTop);
-    rc.innerHTML = ih;
+    rc.style.height = '1px'; // на случай, если браузеру вздумается где-то посередине перерисовать
     rc.style.top = t+'px';
     rc.style.height = (t+h < s.scrollHeight-1 ? h : s.scrollHeight-1-t)+'px';
+    rc.innerHTML = ih;
     // Тут можно убить лишние элементы
     var q0 = curFirst-pagesize;
     q0 = q0 - q0%pagesize;
