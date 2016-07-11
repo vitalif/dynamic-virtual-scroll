@@ -166,7 +166,8 @@ function renderitems()
         ih += '<div class="item" style="height: '+loadedItems[curFirst+i]+'px">'+(curFirst+i)+'</div>';
         h += loadedItems[curFirst+i];
     }
-    var t = Math.round(-loadedItems[curFirst]*curOffset+s.scrollTop);
+    // curPos, чтобы при плавном скролле вниз загруженное в середину не было видно
+    var t = Math.round(-loadedItems[curFirst]*curOffset+curPos);
     rc.style.height = '1px'; // на случай, если браузеру вздумается где-то посередине перерисовать
     rc.style.top = t+'px';
     rc.style.height = (t+h < s.scrollHeight-1 ? h : s.scrollHeight-1-t)+'px';
