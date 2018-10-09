@@ -111,10 +111,10 @@ export function virtualScrollDriver(props, oldState, getRenderedItemHeight)
             }
             sum += itemSize;
         }
-        if (sum + newState.lastItemsTotalHeight + newState.topPlaceholderHeight > newState.targetHeight)
+        const correctedAvg = (sum + newState.lastItemsTotalHeight) / (count + newState.viewportItemCount);
+        if (correctedAvg > newState.avgRowHeight)
         {
-            // avgRowHeight should be corrected
-            newState.avgRowHeight = (sum + newState.lastItemsTotalHeight) / (count + newState.viewportItemCount);
+            newState.avgRowHeight = correctedAvg;
         }
     }
     else
@@ -133,10 +133,10 @@ export function virtualScrollDriver(props, oldState, getRenderedItemHeight)
             sum += itemSize;
         }
         newState.middlePlaceholderHeight = newState.targetHeight - sum - newState.lastItemsTotalHeight - newState.topPlaceholderHeight;
-        if (newState.middlePlaceholderHeight < 0)
+        const correctedAvg = (sum + newState.lastItemsTotalHeight) / (newState.middleItemCount + newState.viewportItemCount);
+        if (correctedAvg > newState.avgRowHeight)
         {
-            // avgRowHeight should be corrected
-            newState.avgRowHeight = (sum + newState.lastItemsTotalHeight) / (newState.middleItemCount + newState.viewportItemCount);
+            newState.avgRowHeight = correctedAvg;
         }
     }
     return newState;
