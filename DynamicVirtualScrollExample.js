@@ -4,6 +4,8 @@ import { virtualScrollDriver } from './DynamicVirtualScroll.js';
 
 export class DynamicVirtualScrollExample extends React.PureComponent
 {
+    useFixedHeader = true
+
     constructor()
     {
         super();
@@ -51,23 +53,40 @@ export class DynamicVirtualScrollExample extends React.PureComponent
     render()
     {
         this.itemElements = [];
-        return (<div style={{overflowY: 'scroll', height: '400px', width: '400px'}}
-            ref={e => this.viewport = e}
-            onScroll={this.componentDidUpdate}>
-            <div style={{height: this.state.targetHeight+'px'}}>
-                {this.state.topPlaceholderHeight
-                    ? <div style={{height: this.state.topPlaceholderHeight+'px'}}></div>
-                    : null}
-                {this.state.middleItemCount
-                    ? this.renderItems(this.state.firstMiddleItem, this.state.middleItemCount)
-                    : null}
-                {this.state.middlePlaceholderHeight
-                    ? <div style={{height: this.state.middlePlaceholderHeight+'px'}}></div>
-                    : null}
-                {this.state.lastItemCount
-                    ? this.renderItems(this.state.items.length-this.state.lastItemCount, this.state.lastItemCount)
-                    : null}
+        return (<div style={{position: 'relative', width: '400px'}}>
+            <div style={{overflowY: 'scroll', height: '400px', width: '400px'}}
+                ref={e => this.viewport = e}
+                onScroll={this.componentDidUpdate}>
+                <div style={{height: this.state.targetHeight+'px'}}>
+                    {this.useFixedHeader
+                        ? <div style={{height: '30px'}}></div>
+                        : null}
+                    {this.state.topPlaceholderHeight
+                        ? <div style={{height: this.state.topPlaceholderHeight+'px'}}></div>
+                        : null}
+                    {this.state.middleItemCount
+                        ? this.renderItems(this.state.firstMiddleItem, this.state.middleItemCount)
+                        : null}
+                    {this.state.middlePlaceholderHeight
+                        ? <div style={{height: this.state.middlePlaceholderHeight+'px'}}></div>
+                        : null}
+                    {this.state.lastItemCount
+                        ? this.renderItems(this.state.items.length-this.state.lastItemCount, this.state.lastItemCount)
+                        : null}
+                </div>
             </div>
+            {this.useFixedHeader ? <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: this.state.scrollbarWidth+'px',
+                height: '30px',
+                background: '#0080c0',
+                color: 'white',
+                textAlign: 'center',
+                lineHeight: '30px'}}>
+                fixed header
+            </div> : null}
         </div>);
     }
 
@@ -78,12 +97,13 @@ export class DynamicVirtualScrollExample extends React.PureComponent
             {
                 totalItems: this.state.items.length,
                 minRowHeight: 30,
-                viewportHeight: this.viewport.clientHeight,
+                viewportHeight: this.viewport.clientHeight - (this.useFixedHeader ? 30 : 0),
                 scrollTop: this.viewport.scrollTop,
             },
             this.state,
             this.getRenderedItemHeight
         );
+        newState.scrollbarWidth = this.viewport ? this.viewport.offsetWidth-this.viewport.clientWidth : 12;
         this.setStateIfDiffers(newState);
     }
 

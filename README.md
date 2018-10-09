@@ -1,6 +1,6 @@
 # Dynamic Virtual Scroll Driver
 
-Virtual scrolling is a technique for displaying long lists when you render only a small number
+Virtual scrolling is a technique for displaying long lists or tables when you render only a small number
 of visible items and skip items that are offscreen. You may also have heard about it like
 "buffered render" or "windowed render" - it's the same.
 
@@ -17,8 +17,9 @@ UI component or framework and are unusable with other ones.
 Good news, everyone: we have a solution!
 
 It is render-agnostic and implemented in this library. Basically, this library only does the maths for you
-while letting you render your component yourself. You can use it with React, Angular, pure JS or any other framework
-you want to. It works smoothly, does not break built-in browser scrolling and even works on mobile devices.
+while letting you render your component yourself. You can use it with React, Angular, pure JS or any other
+framework you want to. You can implement lists and grids (tables) with it. It works smoothly, does not break
+built-in browser scrolling and even works on mobile devices.
 
 # Usage
 
@@ -79,7 +80,7 @@ How to test it:
 * Find maximum possible viewport start in units of (item number + % of item)
 * Measure average height of last rows
 * `avgHeight = max(minHeight, lastRowAvgHeight)`
-* `targetHeight = avgHeight*rowCount + headerHeight`
+* `targetHeight = avgHeight*rowCount`
 * Total scroll view height will be `targetHeight`
 * `scrollPos = targetHeight > offsetHeight ? min(1, scrollTop / (targetHeight - offsetHeight)) : 0`
 * First visible item will be `Math.floor(scrollPos*maxPossibleViewportStart)`
