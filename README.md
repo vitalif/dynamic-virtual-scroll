@@ -61,6 +61,8 @@ What to do with it:
   * `newState.middleItemCount` - item count to be renderer after top placeholder. omit items if it is 0
   * `newState.middlePlaceholderHeight` - height of the second (middle) placeholder. omit placeholder if it is 0
   * `newState.lastItemCount` - item count to be rendered in the end of the list
+* also note that you MUST set `overflow-anchor: none` on your scroll container. You'll end up with
+  `virtualScrollDriver()` not able to finish updating in Chrome if you don't.
 
 # Usage example with React
 

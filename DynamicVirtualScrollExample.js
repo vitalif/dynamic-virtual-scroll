@@ -54,9 +54,10 @@ export class DynamicVirtualScrollExample extends React.PureComponent
     {
         this.itemElements = [];
         return (<div style={{position: 'relative', width: '400px'}}>
-            <div style={{overflowY: 'scroll', height: '400px', width: '400px'}}
+            <div style={{overflowY: 'scroll', height: '400px', width: '400px', overflowAnchor: 'none', outline: 'none'}}
+                tabIndex="1"
                 ref={e => this.viewport = e}
-                onScroll={this.componentDidUpdate}>
+                onScroll={this.driver}>
                 <div style={{height: this.state.targetHeight+'px'}}>
                     {this.useFixedHeader
                         ? <div style={{height: '30px'}}></div>
@@ -90,8 +91,7 @@ export class DynamicVirtualScrollExample extends React.PureComponent
         </div>);
     }
 
-    // We should re-render only when we know we need some items that are not currently rendered
-    componentDidUpdate = () =>
+    driver = () =>
     {
         const newState = virtualScrollDriver(
             {
@@ -105,6 +105,11 @@ export class DynamicVirtualScrollExample extends React.PureComponent
         );
         newState.scrollbarWidth = this.viewport ? this.viewport.offsetWidth-this.viewport.clientWidth : 12;
         this.setStateIfDiffers(newState);
+    }
+
+    componentDidUpdate = () =>
+    {
+        this.driver();
     }
 
     componentDidMount()
