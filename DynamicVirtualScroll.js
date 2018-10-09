@@ -1,15 +1,15 @@
 /**
  * Virtual scroll driver for dynamic row heights
  *
- * License: LGPLv3.0+
- * (c) Vitaliy Filippov 2018
+ * License: GNU LGPLv3.0+
+ * (c) Vitaliy Filippov 2018+
  *
  * @param props { totalItems, minRowHeight, viewportHeight, scrollTop }
  * @param oldState - previous state object
  * @param getRenderedItemHeight = (itemIndex) => height
  *     this function MUST return the height of currently rendered item or 0 if it's not currently rendered
  *     the returned height MUST be >= props.minRowHeight
- *     the function MAY cache heights of rendered items if you feel your list to be more responsive
+ *     the function MAY cache heights of rendered items if you want your list to be more responsive
  * @returns new state object
  *     you MUST re-render your list when any state values change
  *     you MUST preserve all keys in the state object and pass it back via `oldState` on the next run
