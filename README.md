@@ -73,6 +73,10 @@ How to test it:
 * `npm run build`
 * Open `index.html` in your browser
 
+# Demo
+
+http://yourcmc.ru/dynamic-virtual-scroll/
+
 # Algorithm
 
 * Use reasonable fixed minimum row height
