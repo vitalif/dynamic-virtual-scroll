@@ -95,6 +95,10 @@ export function virtualScrollDriver(props, oldState, getRenderedItemHeight)
     firstVisibleItem = Math.floor(firstVisibleItem);
     let firstVisibleItemHeight = getRenderedItemHeight(firstVisibleItem) || newState.avgRowHeight;
     newState.topPlaceholderHeight = scrollTop - firstVisibleItemHeight*firstVisibleItemOffset;
+    if (newState.topPlaceholderHeight < 0)
+    {
+        newState.topPlaceholderHeight = 0;
+    }
     if (firstVisibleItem + newState.viewportItemCount >= props.totalItems - newState.viewportItemCount)
     {
         // Only one placeholder is required
@@ -133,6 +137,10 @@ export function virtualScrollDriver(props, oldState, getRenderedItemHeight)
             sum += itemSize;
         }
         newState.middlePlaceholderHeight = newState.targetHeight - sum - newState.lastItemsTotalHeight - newState.topPlaceholderHeight;
+        if (newState.middlePlaceholderHeight < 0)
+        {
+            newState.middlePlaceholderHeight = 0;
+        }
         const correctedAvg = (sum + newState.lastItemsTotalHeight) / (newState.middleItemCount + newState.viewportItemCount);
         if (correctedAvg > newState.avgRowHeight)
         {

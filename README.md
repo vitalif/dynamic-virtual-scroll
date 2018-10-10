@@ -48,6 +48,9 @@ Description of parameters:
   * this function MUST return the height of currently rendered item or 0 if it's not currently rendered
   * the returned height MUST be >= props.minRowHeight
   * the function MAY cache heights of rendered items if you want your list to be more responsive
+  * WARNING: you SHOULD NOT use `element.offsetHeight` for measuring. Either use `element.getBoundingClientRect().height`
+    or use some pre-computed heights, because `offsetHeight` may truncate the height to -1px when
+    browser scale is not 100%. Also it gives incorrect results with CSS transforms.
 
 Returned object is `newState`. It contains the render parameters for you and also some internal state variables.
 What to do with it:

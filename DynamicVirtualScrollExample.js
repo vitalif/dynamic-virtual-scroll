@@ -33,7 +33,7 @@ export class DynamicVirtualScrollExample extends React.PureComponent
         // DOM example. As smooth as the previous one (memory example), even without caching
         if (this.itemElements[index])
         {
-            return this.itemElements[index].offsetHeight;
+            return this.itemElements[index].getBoundingClientRect().height;
         }
         return 0;
     }
