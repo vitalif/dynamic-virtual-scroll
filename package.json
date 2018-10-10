@@ -1,13 +1,49 @@
 {
-  "name": "struct-edit",
+  "name": "dynamic-virtual-scroll",
+  "version": "1.0.0",
   "author": {
     "name": "Vitaliy Filippov",
     "email": "vitalif@yourcmc.ru",
     "url": "http://yourcmc.ru/wiki/"
   },
-  "description": "Dynamic Virtual Scroll Driver",
+  "description": "Render-agnostic Dynamic Virtual Scroll Driver",
+  "keywords": [
+    "virtual",
+    "scrolling",
+    "list",
+    "grid",
+    "windowed",
+    "dynamic",
+    "virtual-list",
+    "virtual-scroll",
+    "lazy-rendering"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitalif/dynamic-virtual-scroll"
+  },
+  "homepage": "https://github.com/vitalif/dynamic-virtual-scroll",
+  "bugs": {
+    "url": "https://github.com/vitalif/dynamic-virtual-scroll/issues"
+  },
+  "license": "LGPL",
+  "maintainers": [
+    {
+      "name": "vitalif",
+      "email": "vitalif@yourcmc.ru"
+    }
+  ],
+  "files": [
+    "DynamicVirtualScroll.es5.js",
+    "DynamicVirtualScroll.js",
+    "DynamicVirtualScrollExample.js",
+    "README.md"
+  ],
+  "main": "./DynamicVirtualScroll.es5.js",
+  "module": "./DynamicVirtualScroll.js",
   "dependencies": {},
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^7.1.5",
@@ -22,9 +58,8 @@
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.2"
   },
-  "index": "DynamicVirtualScroll.js",
   "scripts": {
-    "build": "eslint Dynamic*.js && webpack --mode=production --optimize-minimize",
+    "build": "eslint Dynamic*.js && webpack --mode=production --optimize-minimize && babel DynamicVirtualScroll.js > DynamicVirtualScroll.es5.js",
     "watch-dev": "NODE_ENV=development webpack --mode=development -w",
     "watch": "webpack --mode=production -w --optimize-minimize"
   }

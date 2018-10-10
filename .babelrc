@@ -1,4 +1,3 @@
 {
-    "presets": [ "env", "stage-1", "react" ],
-    "retainLines": true
+    "presets": [ "env", "stage-1", "react" ]
 }
