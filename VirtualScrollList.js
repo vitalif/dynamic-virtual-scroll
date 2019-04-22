@@ -56,7 +56,13 @@ export class VirtualScrollList extends React.Component
             this.state.scrollTo = this.getItemScrollPos();
             this.state.scrollTimes = 2;
         }
+        const props = { ...this.props };
+        for (const k in VirtualScrollList.propTypes)
+        {
+            delete props[k];
+        }
         return (<div
+            {...props}
             className={this.props.className}
             style={{
                 position: 'relative',
