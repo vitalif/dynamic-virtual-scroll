@@ -80,7 +80,7 @@ export function virtualScrollDriver(props, oldState, getRenderedItemHeight)
             ? newState.avgRowHeight
             : oldState.avgRowHeight;
     }
-    newState.targetHeight = newState.avgRowHeight * newState.scrollHeightInItems;
+    newState.targetHeight = newState.avgRowHeight * newState.scrollHeightInItems + newState.viewportHeight;
     const scrollTop = props.scrollTop;
     let scrollPos = scrollTop / (newState.targetHeight - newState.viewportHeight);
     if (scrollPos > 1)

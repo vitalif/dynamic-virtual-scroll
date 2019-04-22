@@ -1,6 +1,6 @@
 {
   "name": "dynamic-virtual-scroll",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Vitaliy Filippov",
     "email": "vitalif@yourcmc.ru",
@@ -36,6 +36,7 @@
   "files": [
     "DynamicVirtualScroll.es5.js",
     "DynamicVirtualScroll.js",
+    "VirtualScrollList.js",
     "DynamicVirtualScrollExample.js",
     "README.md"
   ],
@@ -59,7 +60,7 @@
     "webpack-cli": "^3.1.2"
   },
   "scripts": {
-    "build": "eslint Dynamic*.js && webpack --mode=production --optimize-minimize && babel DynamicVirtualScroll.js > DynamicVirtualScroll.es5.js",
+    "build": "eslint DynamicVirtualScroll.js && webpack --mode=production --optimize-minimize && babel DynamicVirtualScroll.js > DynamicVirtualScroll.es5.js",
     "watch-dev": "NODE_ENV=development webpack --mode=development -w",
     "watch": "webpack --mode=production -w --optimize-minimize"
   }
