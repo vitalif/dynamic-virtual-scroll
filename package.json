@@ -1,6 +1,6 @@
 {
   "name": "dynamic-virtual-scroll",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": {
     "name": "Vitaliy Filippov",
     "email": "vitalif@yourcmc.ru",
@@ -16,7 +16,8 @@
     "dynamic",
     "virtual-list",
     "virtual-scroll",
-    "lazy-rendering"
+    "lazy-rendering",
+    "react"
   ],
   "repository": {
     "type": "git",
@@ -39,11 +40,10 @@
     "VirtualScrollList.es5.js",
     "VirtualScrollList.js",
     "DynamicVirtualScrollExample.js",
-    "index.js",
     "README.md"
   ],
   "main": "./DynamicVirtualScroll.es5.js",
-  "module": "./index.js",
+  "module": "./DynamicVirtualScroll.js",
   "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
