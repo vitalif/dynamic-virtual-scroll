@@ -124,7 +124,7 @@ export class VirtualScrollList extends React.Component
                 const el = this.viewport.querySelector('div[data-item="'+Math.floor(pos)+'"]');
                 if (el)
                 {
-                    this.viewport.scrollTop = el.offsetTop + el.offsetHeight*(pos-Math.floor(pos));
+                    this.viewport.scrollTop = el.offsetTop - (this.props.headerHeight||0) + el.offsetHeight*(pos-Math.floor(pos));
                 }
                 this.setState({ scrollTimes: 0 });
             }
