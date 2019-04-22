@@ -155,7 +155,7 @@ export class VirtualScrollList extends React.Component
         else
         {
             // Virtual scroll is inactive
-            let avgr = this.state.viewportHeight / this.state.totalItems;
+            let avgr = this.viewport.scrollHeight / this.state.totalItems;
             return this.viewport.scrollTop / avgr;
         }
     }
