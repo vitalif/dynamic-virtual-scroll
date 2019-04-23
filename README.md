@@ -67,7 +67,64 @@ What to do with it:
 * also note that you MUST set `overflow-anchor: none` on your scroll container. You'll end up with
   `virtualScrollDriver()` not able to finish updating in Chrome if you don't.
 
-# Usage example with React
+# Usage with React
+
+There is a reference virtual list implementation for React.
+
+It is usually sufficient for almost everything, including grids. Sad thing about grids (virtualized tables)
+in HTML is that automatic table-like layout is slow in browsers, so in fact the best way to implement
+them is via simple virtualized lists of \<div>'s with absolutely positioned cells inside.
+
+```
+import React from 'react';
+import { VirtualScrollList } from 'dynamic-virtual-scroll/VirtualScrollList.es5.js';
+
+class MyList extends React.Component
+{
+    renderItem = (i) =>
+    {
+        if (!this.items[i])
+            return null;
+        return <div style={{minHeight: '20px'}}>{this.items[i].title}</div>;
+    }
+
+    render()
+    {
+        return <VirtualScrollList
+            totalItems={this.items.length}
+            renderItem={this.renderItem}
+            minRowHeight={20}
+        />;
+    }
+}
+```
+
+Description of VirtualScrollList parameters:
+
+- totalItems: required, total number of items in the list.
+- minRowHeight: required, minimal possible item height in the list.
+- renderItem: required, function that renders item by index as React element(s).
+- viewportHeight: optional, viewport height to use for virtual scrolling.
+  May be used in case when it can't be determined automatically by VirtualScroll,
+  for example inside an animated element with css maxHeight.
+- header: optional, React element(s) to unconditionally render in the beginning of
+  the list. The intended usage is to render fixed header row with CSS position: sticky
+  over the scrolled content.
+- headerHeight: optional. In case there is a fixed header, this must be its height
+  in pixels.
+- All other parameters (className, style, onClick, etc) are passed as-is to the
+  underlying root \<div> of the list.
+
+VirtualScrollList contains some extra shenanigans to make sure the scroll position
+preserves when the total number of items changes. Also it has two extra methods:
+
+- `list.scrollToItem(itemIndex)` - positions the list at `itemIndex`. The index may
+  contain fractional part, in that case the list will be positioned at the corresponding
+  % of height of the item.
+- `list.getItemScrollPos()` - returns current scroll position in items. The returned
+  index may contain fractional part and may be used as input to `list.scrollToItem()`.
+
+# Simpler React example
 
 See `DynamicVirtualScrollExample.js`.
 
