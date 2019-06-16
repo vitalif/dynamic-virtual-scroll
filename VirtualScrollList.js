@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
 import { virtualScrollDriver } from 'dynamic-virtual-scroll';
@@ -33,16 +34,28 @@ export class VirtualScrollList extends React.Component
         scrollTimes: 0,
     }
 
+    setItemRef = []
+    itemRefs = []
+
+    makeRef(i)
+    {
+        this.setItemRef[i] = (e) => this.itemRefs[i] = e;
+    }
+
     renderItems(start, count, is_end)
     {
         let r = [];
         for (let i = 0; i < count; i++)
         {
-            r.push(
-                <div data-item={i+start} key={i+start}>
-                    {this.props.renderItem(i+start)}
-                </div>
-            );
+            let item = this.props.renderItem(i+start);
+            if (item)
+            {
+                if (!this.setItemRef[i+start])
+                {
+                    this.makeRef(i+start);
+                }
+                r.push(<item.type {...item.props} key={i+start} ref={this.setItemRef[i+start]} />);
+            }
         }
         return r;
     }
@@ -93,9 +106,9 @@ export class VirtualScrollList extends React.Component
 
     getRenderedItemHeight = (index) =>
     {
-        if (this.viewport)
+        if (this.itemRefs[index])
         {
-            const e = this.viewport.querySelector('div[data-item="'+index+'"]');
+            const e = ReactDOM.findDOMNode(this.itemRefs[index]);
             if (e)
             {
                 return e.getBoundingClientRect().height;
@@ -127,7 +140,7 @@ export class VirtualScrollList extends React.Component
             }
             else
             {
-                const el = this.viewport.querySelector('div[data-item="'+Math.floor(pos)+'"]');
+                const el = ReactDOM.findDOMNode(this.itemRefs[Math.floor(pos)]);
                 if (el)
                 {
                     this.viewport.scrollTop = el.offsetTop - (this.props.headerHeight||0) + el.offsetHeight*(pos-Math.floor(pos));
