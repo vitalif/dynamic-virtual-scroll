@@ -120,6 +120,10 @@ export class VirtualScrollList extends React.Component
     onScroll = () =>
     {
         this.driver();
+        if (this.props.onScroll)
+        {
+            this.props.onScroll(this.viewport);
+        }
     }
 
     componentDidUpdate = () =>
