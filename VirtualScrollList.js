@@ -181,6 +181,11 @@ export class VirtualScrollList extends React.Component
 
     driver = () =>
     {
+        if (!this.viewport || !this.viewport.offsetParent)
+        {
+            // Fool tolerance - do nothing if we are hidden
+            return false;
+        }
         const newState = virtualScrollDriver(
             {
                 totalItems: this.props.totalItems,
