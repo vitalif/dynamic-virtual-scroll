@@ -111,7 +111,10 @@ export class VirtualScrollList extends React.Component
             const e = ReactDOM.findDOMNode(this.itemRefs[index]);
             if (e)
             {
-                return e.getBoundingClientRect().height;
+                // MSIE sometimes manages to report non-integer element heights for elements of an integer height...
+                // Non-integer element sizes are allowed in getBoundingClientRect, one notable example of them
+                // are collapsed table borders. But we still ignore less than 1/100 of a pixel difference.
+                return Math.round(e.getBoundingClientRect().height*100)/100;
             }
         }
         return 0;
