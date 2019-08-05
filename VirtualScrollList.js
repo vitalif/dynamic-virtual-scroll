@@ -86,7 +86,7 @@ export class VirtualScrollList extends React.Component
             onScroll={this.onScroll}>
             {this.props.header}
             {this.state.targetHeight > 0
-                ? <div key="target" style={{position: 'absolute', left: '-5px', width: '1px', height: this.state.targetHeight+'px'}}></div>
+                ? <div key="target" style={{position: 'absolute', top: 0, left: '-5px', width: '1px', height: this.state.targetHeight+'px'}}></div>
                 : null}
             {this.state.topPlaceholderHeight
                 ? <div style={{height: this.state.topPlaceholderHeight+'px'}} key="top"></div>
