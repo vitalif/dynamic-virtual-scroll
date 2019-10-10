@@ -63,9 +63,10 @@ export class VirtualScrollList extends React.Component
     render()
     {
         if (this.state.totalItems && this.props.totalItems != this.state.totalItems &&
-            this.state.scrollTimes <= 0)
+            this.state.scrollTimes <= 0 && this.viewport && this.viewport.offsetParent)
         {
-            // Automatically preserve scroll position when item count changes
+            // Automatically preserve scroll position when item count changes...
+            // But only when the list is on-screen! We'll end up with an infinite update loop if it's off-screen.
             this.state.scrollTo = this.getItemScrollPos();
             this.state.scrollTimes = 2;
         }
@@ -132,7 +133,8 @@ export class VirtualScrollList extends React.Component
     componentDidUpdate = () =>
     {
         let changed = this.driver();
-        if (!changed && this.state.scrollTimes > 0 && this.props.totalItems > 0)
+        if (!changed && this.state.scrollTimes > 0 && this.props.totalItems > 0 &&
+            this.viewport && this.viewport.offsetParent)
         {
             // FIXME: It would be better to find a way to put this logic back into virtual-scroll-driver
             let pos = this.state.scrollTo;
