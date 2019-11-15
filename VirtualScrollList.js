@@ -36,10 +36,22 @@ export class VirtualScrollList extends React.Component
 
     setItemRef = []
     itemRefs = []
+    itemRefCount = []
 
     makeRef(i)
     {
-        this.setItemRef[i] = (e) => this.itemRefs[i] = e;
+        this.setItemRef[i] = (e) =>
+        {
+            // If the new row instance is mounted before unmouting the old one,
+            // we get called 2 times in wrong order: first with the new instance,
+            // then with null telling us that the old one is unmounted.
+            // We track reference count to workaround it.
+            this.itemRefCount[i] = (this.itemRefCount[i]||0) + (e ? 1 : -1);
+            if (e || !this.itemRefCount[i])
+            {
+                this.itemRefs[i] = e;
+            }
+        };
     }
 
     renderItems(start, count, is_end)

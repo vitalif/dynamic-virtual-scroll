@@ -61,8 +61,10 @@ export function virtualScrollDriver(props, oldState, getRenderedItemHeight)
             lastItemSize = getRenderedItemHeight(props.totalItems - 1 - lastVisibleItems);
             if (!lastItemSize)
             {
-                // Some required items in the end are missing
-                return newState;
+                // Some required items in the end are missing, complain about it loudly, but don't break scrolling
+                // eslint-disable-next-line
+                console.error('dynamic-virtual-scroll: item #'+(props.totalItems - 1 - lastVisibleItems)+' is missing from render, please fix your code');
+                lastItemSize = 0;
             }
             lastItemsHeight += lastItemSize < props.minRowHeight ? props.minRowHeight : lastItemSize;
             lastVisibleItems++;
