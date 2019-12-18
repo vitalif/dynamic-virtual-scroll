@@ -5,12 +5,12 @@ of visible items and skip items that are offscreen. You may also have heard abou
 "buffered render" or "windowed render" - it's the same.
 
 There are plenty of virtual scroll implementations for JS.
-Some of them are part of a larger UI library (ag-grid, ExtJS and so on),
-some of them are more standalone (react-virtualized, react-window, ngx-virtual-scroller, react-dynamic-virtual-list).
+Some of them are part of a larger UI library (ag-grid, ExtJS and so on), some of them are more
+standalone (react-virtualized, react-window, ngx-virtual-scroller, ngx-ui-scroll, react-dynamic-virtual-list).
 
 However, there is a thing that they all miss: dynamic (and unknown apriori) row heights.
 Some implementations allow to set different row heights for items, but you must calculate
-all heights before rendering; some allow dynamic row heights, but have bugs and do not really work;
+all heights before rendering; some allow dynamic row heights, but have bugs and act weird or don't really work;
 others just force you to use fixed row height. Most implementations are also tied to some specific
 UI component or framework and are unusable with other ones.
 
